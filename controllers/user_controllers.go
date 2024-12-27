@@ -62,3 +62,27 @@ func GetUserByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(user)
 }
+
+func DeleteUser(w http.ResponseWriter, r *http.Request) {
+	// Ambil ID dari parameter URL
+	id := mux.Vars(r)["id"]
+
+	// Convert ID ke integer
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	// Cari user berdasarkan ID dan hapus
+	var user models.User
+	result := config.DB.Delete(&user, userID)
+	if result.Error != nil {
+		http.Error(w, "User not found or failed to delete", http.StatusNotFound)
+		return
+	}
+
+	// Kirim response sukses
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNoContent) // No content, karena tidak ada data yang dikembalikan
+}
