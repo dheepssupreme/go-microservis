@@ -5,14 +5,19 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"log"
+	"os"
 )
 
 var DB *gorm.DB
 
 // InitDB menginisialisasi koneksi ke database
 func InitDB() {
-	// Gunakan SQLite sebagai database
-	dsn := "userdb.db"
+	// Ambil path database dari environment variable atau gunakan default
+	dsn := os.Getenv("DB_PATH")
+	if dsn == "" {
+		dsn = "./data/userdb.db" // Lokasi default jika DB_PATH tidak diset
+	}
+
 	var err error
 	DB, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{})
 	if err != nil {

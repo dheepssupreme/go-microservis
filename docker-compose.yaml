@@ -5,31 +5,24 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=secret
-      - DB_NAME=userdb
-    depends_on:
-      - mysql
+      - DB_PATH=./data/userdb.db
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app-network
+    restart: always
 
   product-service:
     build: ./product-service
     ports:
       - "8081:8081"
     environment:
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_USER=root
-      - DB_PASSWORD=secret
-      - DB_NAME=productdb
-    depends_on:
-      - mysql
+      - DB_PATH=./data/productdb.db
+    volumes:
+      - ./data:/app/data
+    networks:
+      - app-network
+    restart: always
 
-  mysql:
-    image: mysql:8.0
-    container_name: mysql
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: secret
+networks:
+  app-network:
