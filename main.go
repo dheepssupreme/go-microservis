@@ -1,19 +1,29 @@
 package main
 
 import (
-    "log"
-    "net/http"
-    "dheepssupreme/go-microservis.git/config"
-    "dheepssupreme/go-microservis.git/routes"
+	"dheepssupreme/go-microservis.git/config"
+	"dheepssupreme/go-microservis.git/routes"
+	"net/http"
+	"log"
 )
 
 func main() {
-    
-    config.InitDB()
+	// Inisialisasi database
+	config.InitDB()
 
-    router := routes.SetupRoutes()
+	// Setup routes
+	router := routes.SetupRoutes()
 
+	// Serve static files (CSS, JS, images, etc.)
+	fs := http.FileServer(http.Dir("./static"))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
 
-    log.Println("User Service running on port 8080")
-    log.Fatal(http.ListenAndServe(":8080", router))
+	// Serve HTML template
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./templates/users.html")
+	})
+
+	// Jalankan server
+	log.Println("Server running on http://localhost:8080")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
